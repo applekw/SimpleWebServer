@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/lgpl.html>.
  * 
  */
- 
+
 package protocol;
 
 import java.io.File;
@@ -35,110 +35,139 @@ import java.util.HashMap;
  */
 public class HttpResponseFactory {
 	/**
-	 * Convenience method for adding general header to the supplied response object.
+	 * Convenience method for adding general header to the supplied response
+	 * object.
 	 * 
-	 * @param response The {@link HttpResponse} object whose header needs to be filled in.
-	 * @param connection Supported values are {@link Protocol#OPEN} and {@link Protocol#CLOSE}.
+	 * @param response
+	 *            The {@link HttpResponse} object whose header needs to be
+	 *            filled in.
+	 * @param connection
+	 *            Supported values are {@link Protocol#OPEN} and
+	 *            {@link Protocol#CLOSE}.
 	 */
-	private static void fillGeneralHeader(HttpResponse response, String connection) {
+	private static void fillGeneralHeader(HttpResponse response,
+			String connection) {
 		// Lets add Connection header
 		response.put(Protocol.CONNECTION, connection);
 
 		// Lets add current date
 		Date date = Calendar.getInstance().getTime();
 		response.put(Protocol.DATE, date.toString());
-		
+
 		// Lets add server info
 		response.put(Protocol.Server, Protocol.getServerInfo());
 
 		// Lets add extra header with provider info
 		response.put(Protocol.PROVIDER, Protocol.AUTHOR);
 	}
-	
+
 	/**
-	 * Creates a {@link HttpResponse} object for sending the supplied file with supplied connection
-	 * parameter.
+	 * Creates a {@link HttpResponse} object for sending the supplied file with
+	 * supplied connection parameter.
 	 * 
-	 * @param file The {@link File} to be sent.
-	 * @param connection Supported values are {@link Protocol#OPEN} and {@link Protocol#CLOSE}.
+	 * @param file
+	 *            The {@link File} to be sent.
+	 * @param connection
+	 *            Supported values are {@link Protocol#OPEN} and
+	 *            {@link Protocol#CLOSE}.
 	 * @return A {@link HttpResponse} object represent 200 status.
 	 */
 	public static HttpResponse create200OK(File file, String connection) {
-		HttpResponse response = new HttpResponse(Protocol.VERSION, Protocol.OK_CODE, 
-				Protocol.OK_TEXT, new HashMap<String, String>(), file);
-		
+		HttpResponse response = new HttpResponse(Protocol.VERSION,
+				Protocol.OK_CODE, Protocol.OK_TEXT,
+				new HashMap<String, String>(), file);
+
 		// Lets fill up header fields with more information
 		fillGeneralHeader(response, connection);
-		
+
 		// Lets add last modified date for the file
 		long timeSinceEpoch = file.lastModified();
 		Date modifiedTime = new Date(timeSinceEpoch);
 		response.put(Protocol.LAST_MODIFIED, modifiedTime.toString());
-		
+
 		// Lets get content length in bytes
 		long length = file.length();
 		response.put(Protocol.CONTENT_LENGTH, length + "");
-		
+
 		// Lets get MIME type for the file
 		FileNameMap fileNameMap = URLConnection.getFileNameMap();
 		String mime = fileNameMap.getContentTypeFor(file.getName());
-		// The fileNameMap cannot find mime type for all of the documents, e.g. doc, odt, etc.
-		// So we will not add this field if we cannot figure out what a mime type is for the file.
+		// The fileNameMap cannot find mime type for all of the documents, e.g.
+		// doc, odt, etc.
+		// So we will not add this field if we cannot figure out what a mime
+		// type is for the file.
 		// Let browser do this job by itself.
-		if(mime != null) { 
+		if (mime != null) {
 			response.put(Protocol.CONTENT_TYPE, mime);
 		}
-		
+
 		return response;
 	}
-	
+
 	/**
 	 * Creates a {@link HttpResponse} object for sending bad request response.
 	 * 
-	 * @param connection Supported values are {@link Protocol#OPEN} and {@link Protocol#CLOSE}.
+	 * @param connection
+	 *            Supported values are {@link Protocol#OPEN} and
+	 *            {@link Protocol#CLOSE}.
 	 * @return A {@link HttpResponse} object represent 400 status.
 	 */
 	public static HttpResponse create400BadRequest(String connection) {
-		HttpResponse response = new HttpResponse(Protocol.VERSION, Protocol.BAD_REQUEST_CODE, 
-				Protocol.BAD_REQUEST_TEXT, new HashMap<String, String>(), null);
-		
+		HttpResponse response = new HttpResponse(Protocol.VERSION,
+				Protocol.BAD_REQUEST_CODE, Protocol.BAD_REQUEST_TEXT,
+				new HashMap<String, String>(), null);
+
 		// Lets fill up header fields with more information
 		fillGeneralHeader(response, connection);
-		
+
 		return response;
 	}
-	
+
 	/**
 	 * Creates a {@link HttpResponse} object for sending not found response.
 	 * 
-	 * @param connection Supported values are {@link Protocol#OPEN} and {@link Protocol#CLOSE}.
+	 * @param connection
+	 *            Supported values are {@link Protocol#OPEN} and
+	 *            {@link Protocol#CLOSE}.
 	 * @return A {@link HttpResponse} object represent 404 status.
 	 */
 	public static HttpResponse create404NotFound(String connection) {
-		HttpResponse response = new HttpResponse(Protocol.VERSION, Protocol.NOT_FOUND_CODE, 
-				Protocol.NOT_FOUND_TEXT, new HashMap<String, String>(), null);
-		
+		HttpResponse response = new HttpResponse(Protocol.VERSION,
+				Protocol.NOT_FOUND_CODE, Protocol.NOT_FOUND_TEXT,
+				new HashMap<String, String>(), null);
+
 		// Lets fill up the header fields with more information
 		fillGeneralHeader(response, connection);
-		
-		return response;	
+
+		return response;
 	}
-	
+
 	/**
-	 * Creates a {@link HttpResponse} object for sending version not supported response.
+	 * Creates a {@link HttpResponse} object for sending version not supported
+	 * response.
 	 * 
-	 * @param connection Supported values are {@link Protocol#OPEN} and {@link Protocol#CLOSE}.
-	 * @return A {@link HttpResponse} object represent 505 status.
+	 * @param connection
+	 *            Supported values are {@link Protocol#OPEN} and
+	 *            {@link Protocol#CLOSE}.
+	 * @return A {@link HttpResponse} object represent 501 status.
 	 */
-	public static HttpResponse create505NotSupported(String connection) {
-		// TODO fill in this method
-		return null;
+	public static HttpResponse create501NotImplemented(String connection) {
+		HttpResponse response = new HttpResponse(Protocol.VERSION,
+				Protocol.NOT_IMPLEMENTED_CODE, Protocol.NOT_IMPLEMENTED_TEXT,
+				new HashMap<String, String>(), null);
+
+		fillGeneralHeader(response, connection);
+
+		return response;
 	}
-	
+
 	/**
-	 * Creates a {@link HttpResponse} object for sending file not modified response.
+	 * Creates a {@link HttpResponse} object for sending file not modified
+	 * response.
 	 * 
-	 * @param connection Supported values are {@link Protocol#OPEN} and {@link Protocol#CLOSE}.
+	 * @param connection
+	 *            Supported values are {@link Protocol#OPEN} and
+	 *            {@link Protocol#CLOSE}.
 	 * @return A {@link HttpResponse} object represent 304 status.
 	 */
 	public static HttpResponse create304NotModified(String connection) {

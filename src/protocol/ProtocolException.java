@@ -37,7 +37,7 @@ public class ProtocolException extends Exception {
 	 */
 	public ProtocolException() {
 		super("An error occured while executing http protocol.");
-		this.status = Protocol.NOT_SUPPORTED_CODE;
+		this.status = Protocol.NOT_IMPLEMENTED_CODE;
 	}
 
 	/**
@@ -47,7 +47,7 @@ public class ProtocolException extends Exception {
 	 */
 	public ProtocolException(String message) {
 		super(message);
-		this.status = Protocol.NOT_SUPPORTED_CODE;
+		this.status = Protocol.NOT_IMPLEMENTED_CODE;
 	}
 
 	/**
@@ -68,7 +68,7 @@ public class ProtocolException extends Exception {
 	 */
 	public ProtocolException(Throwable cause) {
 		super(cause);
-		status = Protocol.NOT_SUPPORTED_CODE;
+		status = Protocol.NOT_IMPLEMENTED_CODE;
 	}
 
 	/**
@@ -79,7 +79,7 @@ public class ProtocolException extends Exception {
 	 */
 	public ProtocolException(String message, Throwable cause) {
 		super(message, cause);
-		status = Protocol.NOT_SUPPORTED_CODE;
+		status = Protocol.NOT_IMPLEMENTED_CODE;
 	}
 	
 	public int getStatus() {
