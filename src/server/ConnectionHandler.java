@@ -104,7 +104,10 @@ public class ConnectionHandler implements Runnable {
 			if(status == Protocol.BAD_REQUEST_CODE) {
 				response = HttpResponseFactory.create400BadRequest(Protocol.CLOSE);
 			}
-			// TODO: Handle version not supported code as well
+			else if (status == Protocol.NOT_IMPLEMENTED_CODE)
+			{
+				response = HttpResponseFactory.create501NotImplemented(Protocol.CLOSE);
+			}
 		}
 		catch(Exception e) {
 			e.printStackTrace();
