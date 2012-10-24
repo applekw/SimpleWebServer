@@ -79,7 +79,7 @@ public class Protocol {
     // Server information that we want to send in "Server:" header field
     public static final String SERVER_INFO = "SimpleWebServer(SWS)/1.0.0";
     public static final String PROVIDER = "Provider";
-    public static final String AUTHOR = "Chandan R. Rupakheti";
+    public static final String AUTHOR = "Kyle Apple, Ian Cundiff, Greg LaPrest";
     public static final String CLOSE = "Close";
     public static final String OPEN = "Keep-Alive";
     public static final String DEFAULT_FILE = "index.html";
