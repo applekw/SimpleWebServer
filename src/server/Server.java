@@ -45,6 +45,7 @@ public class Server implements Runnable {
     private String rootDirectory;
     private int port;
     private boolean stop;
+    private boolean kill;
     private ServerSocket welcomeSocket;
     private long connections;
     private long serviceTime;
@@ -64,6 +65,7 @@ public class Server implements Runnable {
         this.rootDirectory = rootDirectory;
         this.port = port;
         this.stop = false;
+        this.kill = false;
         this.connections = 0;
         this.serviceTime = 0;
         this.window = window;
@@ -144,7 +146,7 @@ public class Server implements Runnable {
                 Socket connectionSocket = this.welcomeSocket.accept();
 
                 // Come out of the loop if the stop flag is set
-                if (this.stop) {
+                if (this.stop || this.kill) {
                     break;
                 }
 
@@ -154,6 +156,10 @@ public class Server implements Runnable {
                 new Thread(handler).start();
             }
             this.welcomeSocket.close();
+            while (!this.requestQueue.isEmpty())
+            {
+              if (this.kill) break;
+            }
             
         } catch (Exception e) {
             window.showSocketException(e);
@@ -181,16 +187,43 @@ public class Server implements Runnable {
         } catch (Exception e) {
         }
     }
+    
+     /**
+     * Stops the server from listening and/or processing queued requests
+     */
+    public synchronized void kill() {
+        if (this.kill) {
+            return;
+        }
+
+        // Set the stop flag to be true and empty the request queue
+        this.kill = true;
+        this.requestQueue.clear();
+        try {
+            // This will force welcomeSocket to come out of the blocked accept() method 
+            // in the main loop of the start() method
+            Socket socket = new Socket(InetAddress.getLocalHost(), port);
+
+            // We do not have any other job for this socket so just close it
+            socket.close();
+        } catch (Exception e) {
+        }
+    }
 
     /**
-     * Checks if the server is stopeed or not.
+     * Checks if the server is stopped or not.
      * @return
      */
-    public boolean isStoped() {
+    public boolean isStopped() {
         if (this.welcomeSocket != null) {
             return this.welcomeSocket.isClosed();
         }
         return true;
+    }
+    
+    public boolean isKilled()
+    {
+         return this.kill;
     }
 
     //logs the given uri and the current system time. Returns true if the uri is blacklisted, false otherwise.
@@ -220,6 +253,7 @@ public class Server implements Runnable {
     {
         this.requestQueue.add(r);
     }
+   
     
     
 }

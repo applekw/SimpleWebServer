@@ -70,8 +70,7 @@ public class ConnectionHandler implements Runnable {
 	 */
 	public void run() {
 		// Get the start time
-		long start = System.currentTimeMillis();
-		
+	long start = System.currentTimeMillis();	
 	 this.server.addRequest(new StreamPackage(this.socket, start));
 		
 		

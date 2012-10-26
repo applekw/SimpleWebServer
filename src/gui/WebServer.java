@@ -51,6 +51,7 @@ public class WebServer extends JFrame {
 	private JPanel panelInput;
 	private JButton butStartServer;
 	private JButton butStopServer;
+                  private JButton butKillServer;
 	private JLabel lblServiceRate;
 	private JTextField txtServiceRate;
 	
@@ -67,7 +68,7 @@ public class WebServer extends JFrame {
 		public void run() {
 			while(!stop) {
 				// Poll if server is not null and server is still accepting connections
-				if(server != null && !server.isStoped()) {
+				if(server != null && !server.isStopped()) {
 					double rate = server.getServiceRate();
 					if(rate == Double.MIN_VALUE)
 						WebServer.this.txtServiceRate.setText("Unknown");
@@ -122,20 +123,27 @@ public class WebServer extends JFrame {
 		this.panelRunServer = new JPanel();
 		this.butStartServer = new JButton("Start Simple Web Server");
 		this.butStopServer = new JButton("Stop Simple Web Server");
+                                    this.butKillServer = new JButton("Kill Simple Web Server");
 		this.butStopServer.setEnabled(false);
+                                    this.butKillServer.setEnabled(false);
 		this.lblServiceRate = new JLabel("Service Rate (Connections Serviced/Second)");
 		this.txtServiceRate = new JTextField("Unknown");
 
 		// panelRunServer uses FlowLayout by default
 		this.panelRunServer.setBorder(BorderFactory.createTitledBorder("Run Server"));
 		this.panelRunServer.setLayout(new SpringLayout());
-		this.panelRunServer.add(this.butStartServer);
-		this.panelRunServer.add(this.butStopServer);
-		this.panelRunServer.add(this.lblServiceRate);
 		this.panelRunServer.add(this.txtServiceRate);
+                                    this.panelRunServer.add(this.butStartServer);
+                                     
+		this.panelRunServer.add(this.butStopServer);
+               
+                                    this.panelRunServer.add(this.butKillServer);
+		this.panelRunServer.add(this.lblServiceRate);
+	
+                
 		
 		// Compact the grid
-		SpringUtilities.makeCompactGrid(this.panelRunServer, 2, 2, 5, 5, 5, 5);
+		SpringUtilities.makeCompactGrid(this.panelRunServer, 2, 2, 5, 20, 5, 5);
 		
 		JPanel contentPane = (JPanel)this.getContentPane();
 		contentPane.add(this.panelInput, BorderLayout.CENTER);
@@ -166,7 +174,7 @@ public class WebServer extends JFrame {
 		// Add action for run server
 		this.butStartServer.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(server != null && !server.isStoped()) {
+				if(server != null && !server.isStopped()) {
 					JOptionPane.showMessageDialog(WebServer.this, "The web server is still running, try again later.", "Server Still Running Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
@@ -202,19 +210,38 @@ public class WebServer extends JFrame {
 		// Add action for stop button
 		this.butStopServer.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(server != null && !server.isStoped())
+				if(server != null && !server.isStopped())
 					server.stop();
 				if(rateUpdater != null)
 					rateUpdater.stop = true;
-				WebServer.this.enableWidgets();
+                                                                        WebServer.this.enableWidgets();
+                                                                        
 			}
 		});
+                
+                                    //Add action for kill button
+                                    this.butKillServer.addActionListener(new ActionListener() {
+                                        public void actionPerformed(ActionEvent e) {
+                                            if(server != null && !server.isKilled()) 
+                                            {
+                                                if (!server.isStopped() ) server.stop();
+                                                server.kill();
+                                            }
+                                            if (rateUpdater != null)
+                                                rateUpdater.stop = true;
+                                            WebServer.this.enableWidgets();
+                                        }
+                                    });
 		
 		// Make sure the web server is stopped before closing the window
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
-				if(server != null && !server.isStoped())
-					server.stop();
+				if(server != null && !server.isStopped())
+                                                                         {
+                                                                          server.stop();
+                                                                          server.kill();
+                                                                           }
+					
 				if(rateUpdater != null)
 					rateUpdater.stop = true;
 			}
@@ -226,6 +253,7 @@ public class WebServer extends JFrame {
 		this.butSelect.setEnabled(false);
 		this.butStartServer.setEnabled(false);
 		this.butStopServer.setEnabled(true);
+                                    this.butKillServer.setEnabled(true);
 	}
 	
 	private void enableWidgets() {
@@ -233,7 +261,16 @@ public class WebServer extends JFrame {
 		this.butSelect.setEnabled(true);
 		this.butStartServer.setEnabled(true);
 		this.butStopServer.setEnabled(false);
+                                    this.butKillServer.setEnabled(false);
 	}
+        
+        private void enableWidgetsAfterStop()
+        {
+                                this.txtPortNumber.setEnabled(true);
+		this.butSelect.setEnabled(true);
+		this.butStartServer.setEnabled(true);
+		this.butStopServer.setEnabled(false);
+        }
 
 	/**
 	 * For displaying exception.
