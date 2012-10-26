@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Map;
 
 import protocol.HttpRequest;
@@ -44,10 +45,15 @@ import protocol.ProtocolException;
 public class ConnectionHandler implements Runnable {
 	private Server server;
 	private Socket socket;
+        
+        
+                 
 	
 	public ConnectionHandler(Server server, Socket socket) {
 		this.server = server;
 		this.socket = socket;
+                
+                                    
 	}
 	
 	/**
@@ -94,12 +100,15 @@ public class ConnectionHandler implements Runnable {
 		HttpResponse response = null;
 		try {
 			request = HttpRequest.read(inStream);
+                                                      boolean blacklisted = server.logAndCheckIfBlackListed(request.getUri());
+                                                      if (blacklisted) return;
+                                                      
 //			System.out.println(request);
 		}
 		catch(ProtocolException pe) {
 			// We have some sort of protocol exception. Get its status code and create response
 			// We know only two kind of exception is possible inside fromInputStream
-			// Protocol.BAD_REQUEST_CODE and Protocol.NOT_SUPPORTED_CODE
+			// Protocol.BAD_REQUEST_CODE and Protocol.NOT_IMPLEMENTED_CODE
 			int status = pe.getStatus();
 			if(status == Protocol.BAD_REQUEST_CODE) {
 				response = HttpResponseFactory.create400BadRequest(Protocol.CLOSE);
