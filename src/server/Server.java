@@ -21,6 +21,7 @@
 package server;
 
 import gui.WebServer;
+import java.io.InputStream;
 
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -28,6 +29,10 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Queue;
+import protocol.HttpRequest;
+import protocol.StreamPackage;
 
 /**
  * This represents a welcoming server for the incoming
@@ -46,6 +51,7 @@ public class Server implements Runnable {
     public HashMap<String, ArrayList<Long>> connectionLog;
     public HashSet<String> blacklist;
     private WebServer window;
+    private Queue<StreamPackage> requestQueue;
    
     private  static final int CONNECTION_NUM_INTERVAL = 3;
     private static final int CONNECTION_MS_INTERVAL = 500; 
@@ -64,6 +70,7 @@ public class Server implements Runnable {
 
         this.connectionLog = new HashMap<String, ArrayList<Long>>();
         this.blacklist = new HashSet<String>();
+        this.requestQueue = new LinkedList<StreamPackage>();
     }
 
     /**
@@ -127,7 +134,9 @@ public class Server implements Runnable {
     public void run() {
         try {
             this.welcomeSocket = new ServerSocket(port);
-
+            RequestProcessor processor = new RequestProcessor(this);
+         
+            new Thread(processor).start();
             // Now keep welcoming new connections until stop flag is set to true
             while (true) {
                 // Listen for incoming socket connection
@@ -141,12 +150,15 @@ public class Server implements Runnable {
 
                 // Create a handler for this incoming connection and start the handler in a new thread
                 ConnectionHandler handler = new ConnectionHandler(this, connectionSocket);
+                
                 new Thread(handler).start();
             }
             this.welcomeSocket.close();
+            
         } catch (Exception e) {
             window.showSocketException(e);
         }
+        
     }
 
     /**
@@ -199,4 +211,15 @@ public class Server implements Runnable {
 
         return false;
     }
+
+    public StreamPackage getNextRequest() {
+       return this.requestQueue.poll();
+    }
+    
+    public void addRequest(StreamPackage r)
+    {
+        this.requestQueue.add(r);
+    }
+    
+    
 }
