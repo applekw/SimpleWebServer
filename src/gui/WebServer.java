@@ -47,11 +47,16 @@ public class WebServer extends JFrame {
 	private JLabel lblRootDirectory;
 	private JTextField txtRootDirectory;
 	private JButton butSelect;
+	
+	private JTextField txtUsername;
+	private JPasswordField txtPassword;
+	private JLabel lblUsername;
+	private JLabel lblPassword;
 
 	private JPanel panelInput;
 	private JButton butStartServer;
 	private JButton butStopServer;
-                  private JButton butKillServer;
+    private JButton butKillServer;
 	private JLabel lblServiceRate;
 	private JTextField txtServiceRate;
 	
@@ -105,18 +110,27 @@ public class WebServer extends JFrame {
 		this.txtRootDirectory.setEditable(false);
 		this.txtRootDirectory.setPreferredSize(new Dimension(400, 21));
 		this.butSelect = new JButton("Select");
+		//Set username and password options
+		this.lblUsername = new JLabel("Username");
+		this.txtUsername = new JTextField("(optional)");
+		this.lblPassword = new JLabel("Password");
+		this.txtPassword = new JPasswordField("(optional)");
 
 		this.panelInput.setBorder(BorderFactory.createTitledBorder("Input Parameters"));
 		this.panelInput.setLayout(new SpringLayout());
 		this.panelInput.add(this.lblPortNumber);
 		this.panelInput.add(this.txtPortNumber);
+		this.panelInput.add(this.lblUsername);
+		this.panelInput.add(this.txtUsername);
+		this.panelInput.add(this.lblPassword);
+		this.panelInput.add(this.txtPassword);
 		this.panelInput.add(this.lblRootDirectory);
 		this.panelInput.add(this.txtRootDirectory);
 		this.panelInput.add(new JLabel("")); // Empty label
 		this.panelInput.add(this.butSelect);
 
 		// Compact the grid
-		SpringUtilities.makeCompactGrid(this.panelInput, 3, 2, 5, 5, 5, 5);
+		SpringUtilities.makeCompactGrid(this.panelInput, 5, 2, 5, 5, 5, 5);
 
 
 		// Run server widgets
@@ -250,6 +264,8 @@ public class WebServer extends JFrame {
 	
 	private void disableWidgets() {
 		this.txtPortNumber.setEnabled(false);
+		this.txtUsername.setEnabled(false);
+		this.txtPassword.setEnabled(false);
 		this.butSelect.setEnabled(false);
 		this.butStartServer.setEnabled(false);
 		this.butStopServer.setEnabled(true);
@@ -258,6 +274,8 @@ public class WebServer extends JFrame {
 	
 	private void enableWidgets() {
 		this.txtPortNumber.setEnabled(true);
+		this.txtUsername.setEnabled(true);
+		this.txtPassword.setEnabled(true);
 		this.butSelect.setEnabled(true);
 		this.butStartServer.setEnabled(true);
 		this.butStopServer.setEnabled(false);

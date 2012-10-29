@@ -44,6 +44,8 @@ public class Server implements Runnable {
 
     private String rootDirectory;
     private int port;
+    private String username;
+    private String password;
     private boolean stop;
     private boolean kill;
     private ServerSocket welcomeSocket;
@@ -64,6 +66,24 @@ public class Server implements Runnable {
     public Server(String rootDirectory, int port, WebServer window) {
         this.rootDirectory = rootDirectory;
         this.port = port;
+        this.username = null;
+        this.password = null;
+        this.stop = false;
+        this.kill = false;
+        this.connections = 0;
+        this.serviceTime = 0;
+        this.window = window;
+
+        this.connectionLog = new HashMap<String, ArrayList<Long>>();
+        this.blacklist = new HashSet<String>();
+        this.requestQueue = new LinkedList<StreamPackage>();
+    }
+    
+    public Server(String rootDirectory, int port, String username, String password, WebServer window) {
+        this.rootDirectory = rootDirectory;
+        this.port = port;
+        this.username = username;
+        this.password = password;
         this.stop = false;
         this.kill = false;
         this.connections = 0;
