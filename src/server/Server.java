@@ -53,6 +53,7 @@ public class Server implements Runnable {
     private long serviceTime;
     public HashMap<String, ArrayList<Long>> connectionLog;
     public HashSet<String> blacklist;
+    private Logger log;
     private WebServer window;
     private Queue<StreamPackage> requestQueue;
    
@@ -73,6 +74,7 @@ public class Server implements Runnable {
         this.connections = 0;
         this.serviceTime = 0;
         this.window = window;
+	this.log = new Logger();
 
         this.connectionLog = new HashMap<String, ArrayList<Long>>();
         this.blacklist = new HashSet<String>();
@@ -145,6 +147,7 @@ public class Server implements Runnable {
      * @param value
      */
     public synchronized void incrementServiceTime(long value) {
+	this.log.logNewline(value);
         this.serviceTime += value;
     }
 
@@ -204,6 +207,7 @@ public class Server implements Runnable {
 
             // We do not have any other job for this socket so just close it
             socket.close();
+	    this.log.close();
         } catch (Exception e) {
         }
     }
@@ -226,6 +230,7 @@ public class Server implements Runnable {
 
             // We do not have any other job for this socket so just close it
             socket.close();
+	    this.log.close();
         } catch (Exception e) {
         }
     }
@@ -271,9 +276,15 @@ public class Server implements Runnable {
     
     public void addRequest(StreamPackage r)
     {
+    if (this.requestQueue.size() <= 10) {
         this.requestQueue.add(r);
+        }
     }
    
+    public Logger getLog()
+    {
+        return this.log;
+    }
     
     
 }
