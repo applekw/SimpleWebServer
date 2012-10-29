@@ -162,6 +162,25 @@ public class HttpResponseFactory {
 	}
 
 	/**
+	 * Creates a {@link HttpResponse} object for sending request entity too
+	 * large response.
+	 * 
+	 * @param connection
+	 *            Supported values are {@link Protocol#OPEN} and
+	 *            {@link Protocol#CLOSE}.
+	 * @return A {@link HttpResponse} object represent 413 status.
+	 */
+	public static HttpResponse create413RequestEntityTooLarge(String connection) {
+		HttpResponse response = new HttpResponse(Protocol.VERSION,
+				Protocol.REQUEST_ENTITY_TOO_LARGE_CODE, Protocol.REQUEST_ENTITY_TOO_LARGE_TEXT,
+				new HashMap<String, String>(), null);
+
+		fillGeneralHeader(response, connection);
+
+		return response;
+	}
+
+	/**
 	 * Creates a {@link HttpResponse} object for sending file not modified
 	 * response.
 	 * 

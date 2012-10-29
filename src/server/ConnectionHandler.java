@@ -71,6 +71,7 @@ public class ConnectionHandler implements Runnable {
 	public void run() {
 		// Get the start time
 	long start = System.currentTimeMillis();	
+	this.server.getLog().log(start / 1000);
 	 this.server.addRequest(new StreamPackage(this.socket, start));
 		
 		

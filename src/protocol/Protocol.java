@@ -36,6 +36,11 @@ public class Protocol {
     public static final char LF = '\n';
     public static final String CRLF = "" + CR + LF;
 
+    // Useful sizes
+    public static final long GIGABYTE = 1024*1024*1024;
+    public static final long MEGABYTE = 1024*1024;
+    public static final long KILOBYTE = 1024;
+
     // Some useful protocol elements
     public static final String VERSION = "HTTP/1.1";
     public static final String GET = "GET";
@@ -50,6 +55,9 @@ public class Protocol {
     public static final int BAD_REQUEST_CODE = 400;
     public static final String BAD_REQUEST_TEXT = "Bad Request";
     
+    public static final int REQUEST_ENTITY_TOO_LARGE_CODE = 413;
+    public static final String REQUEST_ENTITY_TOO_LARGE_TEXT = "Requested File is Too Large";
+
     public static final int NOT_FOUND_CODE = 404;
     public static final String NOT_FOUND_TEXT = "Not Found";
     

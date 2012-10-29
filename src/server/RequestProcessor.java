@@ -44,6 +44,8 @@ public class RequestProcessor implements Runnable {
             }
             Socket socket = s.getSocket();
             long start = s.getStartTime();
+	    long startTransfer = System.currentTimeMillis();
+	    this.server.getLog().log(startTransfer - start);
             InputStream inStream = null;
             OutputStream outStream = null;
 
@@ -147,9 +149,17 @@ public class RequestProcessor implements Runnable {
                             // Lets create 200 OK response
                             response = HttpResponseFactory.create200OK(file, Protocol.CLOSE);
                         }
-                    } else {
-                        // File does not exist so lets create 404 file not found code
-                        response = HttpResponseFactory.create404NotFound(Protocol.CLOSE);
+		    } else {
+			    // File is too large (512 mb), let's deny
+			    if ((double) file.length() > (double) Protocol.GIGABYTE * .5)
+			    {
+				    response = HttpResponseFactory.create413RequestEntityTooLarge(Protocol.CLOSE);
+			    }
+			    // File does not exist so lets create 404 file not found code
+			    else
+			    {
+				    response = HttpResponseFactory.create404NotFound(Protocol.CLOSE);
+			    }
                     }
                 }
             } catch (Exception e) {
