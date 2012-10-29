@@ -123,7 +123,7 @@ public class Server implements Runnable {
      */
     public synchronized double getServiceRate() {
         if (this.serviceTime == 0) {
-            return Long.MIN_VALUE;
+            return Double.MIN_VALUE;
         }
         double rate = this.connections / (double) this.serviceTime;
         rate = rate * 1000;
