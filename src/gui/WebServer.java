@@ -33,8 +33,8 @@ import javax.swing.*;
 import server.Server;
 
 /**
- * The application window for the {@link Server}, where you can update
- * some parameters and start and stop the server.
+ * The application window for the {@link Server}, where you can update some
+ * parameters and start and stop the server.
  * 
  * @author Chandan R. Rupakheti (rupakhet@rose-hulman.edu)
  */
@@ -47,22 +47,17 @@ public class WebServer extends JFrame {
 	private JLabel lblRootDirectory;
 	private JTextField txtRootDirectory;
 	private JButton butSelect;
-	
-	private JTextField txtUsername;
-	private JPasswordField txtPassword;
-	private JLabel lblUsername;
-	private JLabel lblPassword;
 
 	private JPanel panelInput;
 	private JButton butStartServer;
 	private JButton butStopServer;
-    private JButton butKillServer;
+	private JButton butKillServer;
 	private JLabel lblServiceRate;
 	private JTextField txtServiceRate;
-	
+
 	private Server server;
 	private ServiceRateUpdater rateUpdater;
-	
+
 	/**
 	 * For constantly updating the service rate in the GUI.
 	 * 
@@ -70,22 +65,25 @@ public class WebServer extends JFrame {
 	 */
 	private class ServiceRateUpdater implements Runnable {
 		public boolean stop = false;
+
 		public void run() {
-			while(!stop) {
-				// Poll if server is not null and server is still accepting connections
-				if(server != null && !server.isStopped()) {
+			while (!stop) {
+				// Poll if server is not null and server is still accepting
+				// connections
+				if (server != null && !server.isStopped()) {
 					double rate = server.getServiceRate();
-					if(rate == Double.MIN_VALUE)
+					if (rate == Double.MIN_VALUE)
 						WebServer.this.txtServiceRate.setText("Unknown");
 					else
-						WebServer.this.txtServiceRate.setText(Double.toString(rate));
+						WebServer.this.txtServiceRate.setText(Double
+								.toString(rate));
 				}
-				
+
 				// Poll at an interval of 500 milliseconds
 				try {
 					Thread.sleep(500);
+				} catch (Exception e) {
 				}
-				catch(Exception e){}
 			}
 		}
 	}
@@ -110,206 +108,207 @@ public class WebServer extends JFrame {
 		this.txtRootDirectory.setEditable(false);
 		this.txtRootDirectory.setPreferredSize(new Dimension(400, 21));
 		this.butSelect = new JButton("Select");
-		//Set username and password options
-		this.lblUsername = new JLabel("Username");
-		this.txtUsername = new JTextField("(optional)");
-		this.lblPassword = new JLabel("Password");
-		this.txtPassword = new JPasswordField("(optional)");
 
-		this.panelInput.setBorder(BorderFactory.createTitledBorder("Input Parameters"));
+		this.panelInput.setBorder(BorderFactory
+				.createTitledBorder("Input Parameters"));
 		this.panelInput.setLayout(new SpringLayout());
 		this.panelInput.add(this.lblPortNumber);
 		this.panelInput.add(this.txtPortNumber);
-		this.panelInput.add(this.lblUsername);
-		this.panelInput.add(this.txtUsername);
-		this.panelInput.add(this.lblPassword);
-		this.panelInput.add(this.txtPassword);
+
 		this.panelInput.add(this.lblRootDirectory);
 		this.panelInput.add(this.txtRootDirectory);
 		this.panelInput.add(new JLabel("")); // Empty label
 		this.panelInput.add(this.butSelect);
 
 		// Compact the grid
-		SpringUtilities.makeCompactGrid(this.panelInput, 5, 2, 5, 5, 5, 5);
-
+		SpringUtilities.makeCompactGrid(this.panelInput, 3, 2, 5, 5, 5, 5);
 
 		// Run server widgets
 		this.panelRunServer = new JPanel();
 		this.butStartServer = new JButton("Start Simple Web Server");
 		this.butStopServer = new JButton("Stop Simple Web Server");
-                                    this.butKillServer = new JButton("Kill Simple Web Server");
+		this.butKillServer = new JButton("Kill Simple Web Server");
 		this.butStopServer.setEnabled(false);
-                                    this.butKillServer.setEnabled(false);
-		this.lblServiceRate = new JLabel("Service Rate (Connections Serviced/Second)");
+		this.butKillServer.setEnabled(false);
+		this.lblServiceRate = new JLabel(
+				"Service Rate (Connections Serviced/Second)");
 		this.txtServiceRate = new JTextField("Unknown");
 
 		// panelRunServer uses FlowLayout by default
-		this.panelRunServer.setBorder(BorderFactory.createTitledBorder("Run Server"));
+		this.panelRunServer.setBorder(BorderFactory
+				.createTitledBorder("Run Server"));
 		this.panelRunServer.setLayout(new SpringLayout());
 		this.panelRunServer.add(this.txtServiceRate);
-                                    this.panelRunServer.add(this.butStartServer);
-                                     
+		this.panelRunServer.add(this.butStartServer);
+
 		this.panelRunServer.add(this.butStopServer);
-               
-                                    this.panelRunServer.add(this.butKillServer);
+
+		this.panelRunServer.add(this.butKillServer);
 		this.panelRunServer.add(this.lblServiceRate);
-	
-                
-		
+
 		// Compact the grid
 		SpringUtilities.makeCompactGrid(this.panelRunServer, 2, 2, 5, 20, 5, 5);
-		
-		JPanel contentPane = (JPanel)this.getContentPane();
+
+		JPanel contentPane = (JPanel) this.getContentPane();
 		contentPane.add(this.panelInput, BorderLayout.CENTER);
 		contentPane.add(this.panelRunServer, BorderLayout.SOUTH);
-		
+
 		pack();
 	}
-	
+
 	private void addListeners() {
 		// Add the action to be done when select directory button is pressed
 		this.butSelect.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// Get hold of the current directory
-				String currentDirectory = WebServer.this.txtRootDirectory.getText();
+				String currentDirectory = WebServer.this.txtRootDirectory
+						.getText();
 				JFileChooser fileChooser = new JFileChooser(currentDirectory);
 				fileChooser.setDialogTitle("Chose Web Server Root Directory");
 				fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 				fileChooser.setMultiSelectionEnabled(false);
 				fileChooser.setAcceptAllFileFilterUsed(false);
-				if(fileChooser.showOpenDialog(WebServer.this) == JFileChooser.APPROVE_OPTION) {
+				if (fileChooser.showOpenDialog(WebServer.this) == JFileChooser.APPROVE_OPTION) {
 					// A folder has been chosen
-					currentDirectory = fileChooser.getSelectedFile().getAbsolutePath();
+					currentDirectory = fileChooser.getSelectedFile()
+							.getAbsolutePath();
 					WebServer.this.txtRootDirectory.setText(currentDirectory);
 				}
 			}
 		});
-		
+
 		// Add action for run server
 		this.butStartServer.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(server != null && !server.isStopped()) {
-					JOptionPane.showMessageDialog(WebServer.this, "The web server is still running, try again later.", "Server Still Running Error", JOptionPane.ERROR_MESSAGE);
+				if (server != null && !server.isStopped()) {
+					JOptionPane
+							.showMessageDialog(
+									WebServer.this,
+									"The web server is still running, try again later.",
+									"Server Still Running Error",
+									JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				
+
 				// Read port number
 				int port = 80;
 				try {
-					port = Integer.parseInt(WebServer.this.txtPortNumber.getText());
-				}
-				catch(Exception ex) {
-					JOptionPane.showMessageDialog(WebServer.this, "Invalid Port Number!", "Web Server Input Error", JOptionPane.ERROR_MESSAGE);
+					port = Integer.parseInt(WebServer.this.txtPortNumber
+							.getText());
+				} catch (Exception ex) {
+					JOptionPane.showMessageDialog(WebServer.this,
+							"Invalid Port Number!", "Web Server Input Error",
+							JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				
+
 				// Get hold of the root directory
-				String rootDirectory = WebServer.this.txtRootDirectory.getText();
-				
+				String rootDirectory = WebServer.this.txtRootDirectory
+						.getText();
+
 				// Now run the server in non-gui thread
 				server = new Server(rootDirectory, port, WebServer.this);
 				rateUpdater = new ServiceRateUpdater();
-				
+
 				// Disable widgets
 				WebServer.this.disableWidgets();
-				
+
 				// Now run the server in a separate thread
 				new Thread(server).start();
-				
+
 				// Also run the service rate updater thread
 				new Thread(rateUpdater).start();
 			}
 		});
-		
+
 		// Add action for stop button
 		this.butStopServer.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(server != null && !server.isStopped())
+				if (server != null && !server.isStopped())
 					server.stop();
-				if(rateUpdater != null)
+				if (rateUpdater != null)
 					rateUpdater.stop = true;
-                                                                        WebServer.this.enableWidgets();
-                                                                        
+				WebServer.this.enableWidgets();
+
 			}
 		});
-                
-                                    //Add action for kill button
-                                    this.butKillServer.addActionListener(new ActionListener() {
-                                        public void actionPerformed(ActionEvent e) {
-                                            if(server != null && !server.isKilled()) 
-                                            {
-                                                if (!server.isStopped() ) server.stop();
-                                                server.kill();
-                                            }
-                                            if (rateUpdater != null)
-                                                rateUpdater.stop = true;
-                                            WebServer.this.enableWidgets();
-                                        }
-                                    });
-		
+
+		// Add action for kill button
+		this.butKillServer.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (server != null && !server.isKilled()) {
+					if (!server.isStopped())
+						server.stop();
+					server.kill();
+				}
+				if (rateUpdater != null)
+					rateUpdater.stop = true;
+				WebServer.this.enableWidgets();
+			}
+		});
+
 		// Make sure the web server is stopped before closing the window
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
-				if(server != null && !server.isStopped())
-                                                                         {
-                                                                          server.stop();
-                                                                          server.kill();
-                                                                           }
-					
-				if(rateUpdater != null)
+				if (server != null && !server.isStopped()) {
+					server.stop();
+					server.kill();
+				}
+
+				if (rateUpdater != null)
 					rateUpdater.stop = true;
 			}
 		});
 	}
-	
+
 	private void disableWidgets() {
 		this.txtPortNumber.setEnabled(false);
-		this.txtUsername.setEnabled(false);
-		this.txtPassword.setEnabled(false);
+
 		this.butSelect.setEnabled(false);
 		this.butStartServer.setEnabled(false);
 		this.butStopServer.setEnabled(true);
-                                    this.butKillServer.setEnabled(true);
+		this.butKillServer.setEnabled(true);
 	}
-	
+
 	private void enableWidgets() {
 		this.txtPortNumber.setEnabled(true);
-		this.txtUsername.setEnabled(true);
-		this.txtPassword.setEnabled(true);
+
 		this.butSelect.setEnabled(true);
 		this.butStartServer.setEnabled(true);
 		this.butStopServer.setEnabled(false);
-                                    this.butKillServer.setEnabled(false);
+		this.butKillServer.setEnabled(false);
 	}
-        
-        private void enableWidgetsAfterStop()
-        {
-                                this.txtPortNumber.setEnabled(true);
+
+	private void enableWidgetsAfterStop() {
+		this.txtPortNumber.setEnabled(true);
 		this.butSelect.setEnabled(true);
 		this.butStartServer.setEnabled(true);
 		this.butStopServer.setEnabled(false);
-        }
+	}
 
 	/**
 	 * For displaying exception.
+	 * 
 	 * @param e
 	 */
 	public void showSocketException(Exception e) {
-		JOptionPane.showMessageDialog(this, e.getMessage(), "Web Server Socket Problem", JOptionPane.ERROR_MESSAGE);
-		if(this.server != null)
+		JOptionPane.showMessageDialog(this, e.getMessage(),
+				"Web Server Socket Problem", JOptionPane.ERROR_MESSAGE);
+		if (this.server != null)
 			this.server.stop();
 		this.server = null;
-		
-		if(this.rateUpdater != null)
+
+		if (this.rateUpdater != null)
 			this.rateUpdater.stop = true;
 		this.rateUpdater = null;
 		this.enableWidgets();
 	}
-	
+
 	/**
 	 * The application start point.
 	 * 
-	 * @param args the command line arguments
+	 * @param args
+	 *            the command line arguments
 	 */
 	public static void main(String args[]) {
 		java.awt.EventQueue.invokeLater(new Runnable() {
